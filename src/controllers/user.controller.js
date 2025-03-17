@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async(req, res)=>{
         throw new ApiError(400,"All fields are required")
     }
 
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{ username }, { email }]
     })
 
@@ -33,7 +33,13 @@ const registerUser = asyncHandler(async(req, res)=>{
 //multer gives files from middleware previosly it was body by express. The field has many properties file, png,jpg
     const avatarLocalPath = req.files?.avatar[0]?.path;
     //0 i.e. first property gives a object, multer takes the files when submitted to his server and then gives the original name
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    //const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) &&
+    req.files.coverImage.length > 0){
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
 
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar file is required")
